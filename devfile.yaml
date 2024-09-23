@@ -27,8 +27,3 @@ components:
   - name: m2
     volume:
       size: 2Gi
-commands:
-  - exec:
-      component: frontend
-      workingDir: '/projects/simple-patternflyapp/frontend'
-    id: frontend-id
