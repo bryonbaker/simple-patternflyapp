@@ -9,7 +9,7 @@ components:
       memoryLimit: 512Mi
       volumeMounts:
         - name: venv
-          mountPath: /home/user/.venv
+          path: /home/user/.venv
       mountSources: true
       sourceMapping: /projects/myapp/backend
       endpoints:
