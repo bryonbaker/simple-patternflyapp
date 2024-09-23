@@ -7,6 +7,9 @@ components:
     container:
       image: python:3.9
       memoryLimit: 512Mi
+      volumeMounts:
+        - name: venv
+          mountPath: /home/user/.venv
       mountSources: true
       sourceMapping: /projects/myapp/backend
       endpoints:
@@ -16,9 +19,6 @@ components:
       env:
         - name: FLASK_APP
           value: wsgi.py
-      volumesMounts:
-        - name: venv
-          mountPath: /home/user/.venv
       command: ["/bin/sh"]
       args: ["-c", "python3 -m venv /home/user/.venv && source /home/user/.venv/bin/activate && pip install -r requirements.txt && flask run --host=0.0.0.0"]
 
