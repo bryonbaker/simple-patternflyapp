@@ -1,0 +1,34 @@
+schemaVersion: 2.2.0
+metadata:
+  name: simple-patternflyapp
+components:
+  - name: frontend
+    container:
+      sourceMapping: /frontend
+      memoryLimit: 8Gi
+      memoryRequest: 512Mi
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+      image: registry.redhat.io/devspaces/udi-rhel8
+      endpoints:
+        - exposure: public
+          name: frontend-dev
+          targetPort: 8080
+          protocol: https
+        - exposure: public
+          name: swagger-ui
+          targetPort: 8080
+          protocol: https
+          path: /q/swagger-ui
+      env:
+        - name: CHE_PLUGIN_REGISTRY_URL
+          value: https://open-vsx.org
+  - name: m2
+    volume:
+      size: 2Gi
+commands:
+  - exec:
+      component: frontend
+      workingDir: '/projects/simple-patternflyapp/frontend'
+    id: frontend-id
