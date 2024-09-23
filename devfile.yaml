@@ -1,29 +1,63 @@
 schemaVersion: 2.2.0
 metadata:
-  name: simple-patternflyapp
+  name: flask-react-app
+  description: Dev Spaces workspace for a Flask backend and React frontend app
 components:
-  - name: frontend
+  - name: flask-backend
     container:
-      sourceMapping: /frontend
-      memoryLimit: 8Gi
-      memoryRequest: 512Mi
-      volumeMounts:
-        - name: m2
-          path: /home/user/.m2
-      image: registry.redhat.io/devspaces/udi-rhel8
+      image: python:3.9
+      memoryLimit: 512Mi
+      mountSources: true
+      sourceMapping: /projects/myapp/backend
       endpoints:
-        - exposure: public
-          name: frontend-dev
-          targetPort: 8080
-          protocol: https
-        - exposure: public
-          name: swagger-ui
-          targetPort: 8080
-          protocol: https
-          path: /q/swagger-ui
+        - name: flask
+          targetPort: 5000
+          secure: false
       env:
-        - name: CHE_PLUGIN_REGISTRY_URL
-          value: https://open-vsx.org
-  - name: m2
-    volume:
-      size: 2Gi
+        - name: FLASK_APP
+          value: wsgi.py
+      volumes:
+        - name: venv
+          mountPath: /home/user/.venv
+      command: ["/bin/sh"]
+      args: ["-c", "python3 -m venv /home/user/.venv && source /home/user/.venv/bin/activate && pip install -r requirements.txt && flask run --host=0.0.0.0"]
+
+  - name: react-frontend
+    container:
+      image: node:16
+      memoryLimit: 512Mi
+      mountSources: true
+      sourceMapping: /projects/myapp/frontend
+      endpoints:
+        - name: react
+          targetPort: 3000
+          secure: false
+      command: ["/bin/sh"]
+      args: ["-c", "npm install && npm start"]
+
+commands:
+  - id: start-backend
+    apply:
+      component: flask-backend
+
+  - id: start-frontend
+    apply:
+      component: react-frontend
+
+  - id: install-backend-deps
+    exec:
+      component: flask-backend
+      commandLine: "pip install -r requirements.txt"
+      workingDir: /projects/myapp/backend
+      group:
+        kind: build
+        isDefault: true
+
+  - id: install-frontend-deps
+    exec:
+      component: react-frontend
+      commandLine: "npm install"
+      workingDir: /projects/myapp/frontend
+      group:
+        kind: build
+        isDefault: true
