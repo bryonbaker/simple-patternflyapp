@@ -16,11 +16,15 @@ components:
       env:
         - name: FLASK_APP
           value: wsgi.py
-      volumes:
+      volumesMounts:
         - name: venv
           mountPath: /home/user/.venv
       command: ["/bin/sh"]
       args: ["-c", "python3 -m venv /home/user/.venv && source /home/user/.venv/bin/activate && pip install -r requirements.txt && flask run --host=0.0.0.0"]
+
+  - name: venv
+    volume:
+      size: 2Gi
 
   - name: react-frontend
     container:
